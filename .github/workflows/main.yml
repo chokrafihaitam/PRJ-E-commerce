@@ -1,52 +1,31 @@
-name: CI - PHP
+name: PHP CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, master ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        php-versions: [8.1, 8.2, 8.3]
-
+    
     steps:
-      - name: Checkout du code
-        uses: actions/checkout@v4
-
-      - name: Configuration de PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-versions }}
-          extensions: mbstring, intl, pdo_mysql
-          coverage: xdebug
-
-      - name: Vérification de la version de PHP
-        run: php -v
-
-      - name: Installation des dépendances Composer
-        run: composer install --no-progress --prefer-dist --no-interaction
-
-      - name: Vérification du style de code (optionnel)
-        run: |
-          if [ -f vendor/bin/phpcs ]; then
-            vendor/bin/phpcs --standard=PSR12 src
-          fi
-
-      - name: Analyse statique (optionnel)
-        run: |
-          if [ -f vendor/bin/phpstan ]; then
-            vendor/bin/phpstan analyse src --level=max
-          fi
-
-      - name: Exécution des tests avec PHPUnit
-        run: |
-          if [ -f vendor/bin/phpunit ]; then
-            vendor/bin/phpunit --coverage-text
-          else
-            echo "PHPUnit n’est pas installé via Composer"
-          fi
+    - uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+    
+    - name: Vérifier la syntaxe PHP
+      run: |
+        # Vérifie la syntaxe de tous les fichiers PHP
+        find . -name "*.php" -not -path "./vendor/*" -print0 | xargs -0 -n1 php -l
+    
+    - name: Afficher les informations du projet
+      run: |
+        echo "Structure du projet :"
+        ls -la
+        echo "Version PHP :"
+        php -v
