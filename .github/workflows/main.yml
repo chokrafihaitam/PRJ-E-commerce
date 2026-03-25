@@ -1,0 +1,31 @@
+name: PHP CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+    
+    - name: Vérifier la syntaxe PHP
+      run: |
+        # Vérifie la syntaxe de tous les fichiers PHP
+        find . -name "*.php" -not -path "./vendor/*" -print0 | xargs -0 -n1 php -l
+    
+    - name: Afficher les informations du projet
+      run: |
+        echo "Structure du projet :"
+        ls -la
+        echo "Version PHP :"
+        php -v
